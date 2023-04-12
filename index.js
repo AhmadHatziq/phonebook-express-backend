@@ -5,6 +5,7 @@ const cors = require('cors')
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
+// app.use('/build', express.static('build'))
 
 // Register a custom token to display the data sent in HTTP POST requests 
 // morgan.token('type', function (req, res) { return req.headers['content-type'] })

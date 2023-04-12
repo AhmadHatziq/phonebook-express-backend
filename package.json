@@ -8,6 +8,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
+  "proxy": "http://localhost:3001", 
   "author": "",
   "license": "ISC",
   "dependencies": {
