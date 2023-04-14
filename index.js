@@ -53,6 +53,7 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
+// Using the String ID, query the Person schema for matching ID.
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
 
@@ -107,6 +108,7 @@ app.delete('/api/persons/:id', (request, response) => {
           })
     }
 
+    /*
     // Checks if the name already exists. 
     const exists = persons.some(obj => obj.name === body.name); 
     if (exists) {
@@ -114,22 +116,21 @@ app.delete('/api/persons/:id', (request, response) => {
             error: 'name must be unique' 
           })
     }
+    */ 
     
     // Create a new person object
-    const newPerson = {
-        id: generateId(), 
+    const newPerson = new Person({
         name: body.name, 
-        number: body.number 
-    }
+        number: body.number, 
+        toShow: true 
+    })
 
-    // Append to the persons array
-    persons = persons.concat(newPerson)
-
-    // Return the newly created person 
-    response.json(newPerson)
-
-    // Print the current persons array 
-    // console.log(persons)
+    // Save person to DB. 
+    newPerson
+      .save()
+      .then(savedPerson => {
+        response.json(savedPerson)
+      })
   })
 
 // Returns the total number of people in the phonebook and time of request. 
