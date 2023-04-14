@@ -27,7 +27,6 @@ mongoose.connect(url)
 
 // Create schema of People. number represents a phoneNumber. 
 const personSchema = new mongoose.Schema({
-  id: Number,
   name: String,
   number: String,
   toShow: Boolean
@@ -58,22 +57,8 @@ if (process.argv.length === 3) {
   const personName = process.argv[3]
   const personNumber = process.argv[4]
 
-  // Commented out as not sure how to implement currentId
-  /*
-  let currentMaxId = -1
-  Person.find({}).then(result => {
-    if (result.length === 0) {
-      currentMaxId = 0
-    } else {
-      currentMaxId = Number(result[0].id) 
-  }})
-
-  console.log(currentMaxId)
-  */ 
-
   // Create & save the person 
   const newPerson = new Person({
-    id:1, 
     name: personName,
     number: personNumber,
     toShow: true
@@ -87,8 +72,3 @@ if (process.argv.length === 3) {
   console.log('Error.')
   mongoose.connection.close()
 }
-
-
-
-
-
