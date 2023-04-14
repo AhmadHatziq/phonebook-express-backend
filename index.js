@@ -34,6 +34,7 @@ const personSchema = new mongoose.Schema({
   number: String, 
   toShow: Boolean 
 })
+const Person = mongoose.model('Person', personSchema)
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
@@ -73,7 +74,9 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
+  Person.find({}).then(persons => {
     response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
