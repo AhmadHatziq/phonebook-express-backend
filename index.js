@@ -1,11 +1,28 @@
 const express = require('express')
-var morgan = require('morgan')
+const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
+
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
-// app.use('/build', express.static('build'))
+
+// Create a custom middleware to log requests to the 'build' folder
+app.use('/build', (req, res, next) => {
+  morgan('dev')(req, res, () => {})
+  next()
+})
+
+// Create a custom middleware to log requests to the 'build' folder
+app.use('/build', morgan('dev'))
+
+
+morgan.token('file_path', (req, res) => {
+  if (req.method === 'GET' && res.statusCode === 200 && req.url.endsWith('.html')) {
+    return req.url
+  }
+})
+
 
 // Register a custom token to display the data sent in HTTP POST requests 
 // morgan.token('type', function (req, res) { return req.headers['content-type'] })
@@ -15,7 +32,9 @@ morgan.token('posted_data', logJsonPost = (req, res)  => {
     }
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :posted_data'))
+//app.use(morgan('combined'))
+app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :posted_data '))
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :posted_data :file_path'))
 
 let persons = [
     { 
@@ -43,10 +62,6 @@ let persons = [
       "toShow": true
     }
 ]
-
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-})
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
