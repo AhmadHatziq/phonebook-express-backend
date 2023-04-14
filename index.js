@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
 const dotenv = require('dotenv').config()
+const Person = require('./models/person')
 
 app.use(cors())
 app.use(express.json())
@@ -16,34 +17,6 @@ morgan.token('posted_data', logJsonPost = (req, res)  => {
     }
 })
 app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :posted_data '))
-
-// Mongoose definitions 
-const mongoose = require('mongoose')
-mongoose.set('strictQuery', false)
-const url = process.env.MONGODB_URI
-console.log('connecting to', url)
-mongoose.connect(url)
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
-  })
-const personSchema = new mongoose.Schema({
-  name: String, 
-  number: String, 
-  toShow: Boolean 
-})
-const Person = mongoose.model('Person', personSchema)
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-// Retrieve data from Mongoose DB. 
 
 // Hardcoded data. 
 let persons = [
@@ -73,6 +46,7 @@ let persons = [
     }
 ]
 
+// Query the schema for all Person objects, transform it and send it to the front-end. 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
