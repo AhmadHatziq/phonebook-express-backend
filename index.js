@@ -16,7 +16,7 @@ morgan.token('posted_data', logJsonPost = (req, res)  => {
         return JSON.stringify(req.body)
     }
 })
-app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :posted_data '))
+app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" - :posted_data '))
 
 // Hardcoded data. 
 let persons = [
@@ -67,18 +67,22 @@ app.get('/api/persons/:id', (request, response) => {
       })
 })
 
+
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
+    const id = String(request.params.id)
 
-    // Filter and remove the matching id 
-    persons = persons.filter(person => person.id !== id)
-  
-    // Send status 204. 
-    response.status(204).end()
+    console.log(`Attempting to delete person ID: ${id}`)
 
-    // Check that persons had deleted the person. 
-    //console.log(persons)
-
+    // Use findByIdAndRemove 
+    Person.findByIdAndRemove(id)
+      .then(result => {
+        console.log(`Successfully deleted person ${result}`)
+        response.status(204).end()
+      })
+      .catch(error => {
+        console.log(error.message)
+        response.status(500).end()
+      })
   })
 
   // Generate a random ID from the largest current ID to positive infinity 
@@ -118,7 +122,7 @@ app.delete('/api/persons/:id', (request, response) => {
     }
     */ 
     
-    // Create a new person object
+    // Create a new person object. ID is now handled by the backend. 
     const newPerson = new Person({
         name: body.name, 
         number: body.number, 
