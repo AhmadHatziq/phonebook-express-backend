@@ -79,7 +79,6 @@ app.get('/api/persons/:id', (request, response, next) => {
         response.json(person)
       })
       .catch(error => {
-        response.status(404).end()
         next(error)
       })
 })
