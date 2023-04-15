@@ -18,6 +18,22 @@ morgan.token('posted_data', logJsonPost = (req, res)  => {
 })
 app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" - :posted_data '))
 
+// Generic error handler 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+// Unknown endpoint error handler
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
 // Hardcoded data. 
 let persons = [
     { 
@@ -64,10 +80,11 @@ app.get('/api/persons/:id', (request, response) => {
       })
       .catch(error => {
         response.status(404).end()
+        next(error)
       })
 })
 
-
+// When the frontend/POSTMAN sends a DELETE request, extract the ID (via the URL) and remove from DB.  
 app.delete('/api/persons/:id', (request, response) => {
     const id = String(request.params.id)
 
@@ -79,10 +96,7 @@ app.delete('/api/persons/:id', (request, response) => {
         console.log(`Successfully deleted person ${result}`)
         response.status(204).end()
       })
-      .catch(error => {
-        console.log(error.message)
-        response.status(500).end()
-      })
+      .catch(error => next(error))
   })
 
   // Generate a random ID from the largest current ID to positive infinity 
@@ -146,6 +160,10 @@ app.get('/info', (request, response) => {
     `
     response.send(responseHtml)
 })
+
+// Use the error handling functions. 
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 // Make the server listen on port 3001 or the environment variable (for deployment)
 const PORT = process.env.PORT || 3001
