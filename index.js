@@ -108,7 +108,32 @@ const generateId = () => {
   return randomId
 }
 
-// Add a new person when a POST request is made. 
+// The PUT endpoint is to update any existing Person. 
+// Uses the findByIdAndUpdate() method, which requires a JS object, not Person. 
+// Is called by the front-end when there is an existing person with the same name. 
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body 
+  const id = request.params.id 
+
+  // Create the updated object 
+  const person = {
+    name: body.name, 
+    number: body.number, 
+    toShow: body.toShow 
+  }
+
+  // Update the DB. 
+  // By default, updatedPerson will be the old version. We set new:true to get the updated version. 
+  Person.findByIdAndUpdate(id, person, {new: true})
+    .then(updatedPerson => {
+      console.log(`Update: ${JSON.stringify(updatedPerson)}`)
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+  
+})
+
+// Create a new person in the DB. 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body 
 
@@ -126,8 +151,6 @@ app.post('/api/persons', (request, response, next) => {
         })
   }
 
-
-  
   // Create a new person object. ID is now handled by the backend. 
   const newPerson = new Person({
       name: body.name, 
@@ -139,13 +162,9 @@ app.post('/api/persons', (request, response, next) => {
   newPerson
     .save()
     .then(savedPerson => {
+      console.log(`Created new person: ${JSON.stringify(savedPerson)}`)
       response.json(savedPerson)
     })
-})
-
-// The PUT endpoint is to update any existing Person
-app.put('/api/persons/:id', (request, response, next) => {
-  console.log('put route')
 })
 
 // Returns the total number of people in the phonebook and time of request. 
