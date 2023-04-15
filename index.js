@@ -70,7 +70,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 // Using the String ID, query the Person schema for matching ID.
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
 
     // Query the Person model for the ID and return the person json 
@@ -85,7 +85,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 // When the frontend/POSTMAN sends a DELETE request, extract the ID (via the URL) and remove from DB.  
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = String(request.params.id)
 
     console.log(`Attempting to delete person ID: ${id}`)
@@ -99,57 +99,55 @@ app.delete('/api/persons/:id', (request, response) => {
       .catch(error => next(error))
   })
 
-  // Generate a random ID from the largest current ID to positive infinity 
-  const generateId = () => {
-    const maxId = persons.length > 0
-      ? Math.max(...persons.map(p => p.id))
-      : 0
-    const randomId = maxId + 1 + Math.floor(Math.random() * 10000)
-    return randomId
+// Generate a random ID from the largest current ID to positive infinity. 
+// No longer in use as ID generation is done by the DB, not the backend. 
+const generateId = () => {
+  const maxId = persons.length > 0
+    ? Math.max(...persons.map(p => p.id))
+    : 0
+  const randomId = maxId + 1 + Math.floor(Math.random() * 10000)
+  return randomId
+}
+
+// Add a new person when a POST request is made. 
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body 
+
+  // Check if there is missing name 
+  if (!body.name) {
+      return response.status(400).json({ 
+        error: 'name missing' 
+      })
   }
 
-  // Add a new person when a POST request is made. 
-  app.post('/api/persons', (request, response) => {
-    const body = request.body 
-
-    // Check if there is missing name 
-    if (!body.name) {
-        return response.status(400).json({ 
-          error: 'name missing' 
+  // Checks if there is missing number 
+  if (!body.number) {
+      return response.status(400).json({ 
+          error: 'number missing' 
         })
-    }
+  }
 
-    // Checks if there is missing number 
-    if (!body.number) {
-        return response.status(400).json({ 
-            error: 'number missing' 
-          })
-    }
 
-    /*
-    // Checks if the name already exists. 
-    const exists = persons.some(obj => obj.name === body.name); 
-    if (exists) {
-        return response.status(400).json({ 
-            error: 'name must be unique' 
-          })
-    }
-    */ 
-    
-    // Create a new person object. ID is now handled by the backend. 
-    const newPerson = new Person({
-        name: body.name, 
-        number: body.number, 
-        toShow: true 
-    })
-
-    // Save person to DB. 
-    newPerson
-      .save()
-      .then(savedPerson => {
-        response.json(savedPerson)
-      })
+  
+  // Create a new person object. ID is now handled by the backend. 
+  const newPerson = new Person({
+      name: body.name, 
+      number: body.number, 
+      toShow: true 
   })
+
+  // Save person to DB. 
+  newPerson
+    .save()
+    .then(savedPerson => {
+      response.json(savedPerson)
+    })
+})
+
+// The PUT endpoint is to update any existing Person
+app.put('/api/persons/:id', (request, response, next) => {
+  console.log('put route')
+})
 
 // Returns the total number of people in the phonebook and time of request. 
 app.get('/info', (request, response) => {
