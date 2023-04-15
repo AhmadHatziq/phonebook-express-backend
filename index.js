@@ -25,7 +25,8 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: error.message })
+    let errorMessage = `Number must be of the form: {2_or_3_digits}-{5_digits}. Eg 12-12345 ${error.message}`
+    return response.status(400).send({ error: errorMessage })
   }
 
   next(error)
