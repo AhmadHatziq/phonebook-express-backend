@@ -24,6 +24,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message})
   }
 
   next(error)
@@ -165,6 +167,7 @@ app.post('/api/persons', (request, response, next) => {
       console.log(`Created new person: ${JSON.stringify(savedPerson)}`)
       response.json(savedPerson)
     })
+    .catch(error => next(error))
 })
 
 // Returns the total number of people in the phonebook and time of request. 
