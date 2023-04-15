@@ -21,8 +21,8 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema)
 
-/* 
-// Creates a new Note 
+/*
+// Creates a new Note
 const note = new Note({
   content: 'HTML is Easy',
   important: true,

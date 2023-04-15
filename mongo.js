@@ -10,8 +10,8 @@ node mongo.js <Password> <PersonName> <PersonNumber>`
 // 3rd argument will be the password. 
 // If there are  3 arguments, show the phonebook 
 // If there are 5 arguments, add the personName and number to the db.  
-if (process.argv.length != 3 && process.argv.length != 5) {
-  console.log(`Incorrect number of arguments. `)
+if (process.argv.length !== 3 && process.argv.length !== 5) {
+  console.log('Incorrect number of arguments.')
   console.log(usage)
   process.exit(1)
 } 
@@ -34,11 +34,6 @@ const personSchema = new mongoose.Schema({
 
 // Create the model using the schema
 const Person = mongoose.model('Person', personSchema)
-
-// Function to get maxID from DB. 
-const getMaxId = () => {
-  
-}
 
 // If length is 3, only show the contents of the database. 
 if (process.argv.length === 3) { 
