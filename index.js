@@ -170,11 +170,19 @@ app.post('/api/persons', (request, response, next) => {
 // Returns the total number of people in the phonebook and time of request. 
 app.get('/info', (request, response) => {
     const currentDateTime = new Date() 
-    const responseHtml = `
-        <p>Phonebook has info for ${persons.length} people</p>
+
+    // Queries the DB to get the total row counts 
+    Person.find({}).then(persons => {
+      const totalNumber = persons.length 
+      
+      const responseHtml = 
+        `
+        <p>Phonebook has info for ${totalNumber} people</p>
         <p> ${currentDateTime.toString()}  </p>
-    `
+        `
     response.send(responseHtml)
+    })
+    .catch(error => next(error))
 })
 
 // Use the error handling functions. 
