@@ -3,3 +3,4 @@ This is a phonebook application which is hosted [here](https://phonebook-express
 
 The Front End uses React and the build files are in the build directory. 
 The Back End uses Node js Express. 
+The database used in MongoDB. 
